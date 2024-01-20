@@ -570,7 +570,7 @@ require('which-key').register {
   ['<leader>s'] = { name = '[S]earch', _ = 'which_key_ignore' },
   ['<leader>t'] = { name = '[T]oggle', _ = 'which_key_ignore' },
   ['<leader>w'] = { name = '[W]orkspace', _ = 'which_key_ignore' },
-  ['<leader>p'] = { name = '[p] Run', _ = 'which_key_ignore' },
+  ['<F5>'] = { name = 'Run / Debug', _ = 'which_key_ignore' },
 }
 -- register which-key VISUAL mode
 -- required for visual <leader>hs (hunk stage) to work
@@ -730,8 +730,8 @@ require("nvim-tree").setup({
 vim.keymap.set("n", "<leader>t", ":NvimTreeToggle<CR>", { silent = true })
 
 --Compiler
-vim.keymap.set("n", "<C-x>c", ":!g++ -std=c++20 -Wall -Werror -g -pedantic -Weffc++ % && ./a.out<Return>", { silent = true, desc = "GCC for C++" })
-vim.keymap.set("n", "<C-x>b", ":!bun %<CR>", { silent = true, desc = "Bun for JavaScript/TypeScript" })
+vim.keymap.set("n", "<F5>c", ":!g++ -std=c++20 -Wall -Werror -g -pedantic -Weffc++ % && ./a.out<Return>", { silent = true, desc = "GCC for C++" })
+vim.keymap.set("n", "<F5>b", ":!bun %<CR>", { silent = true, desc = "Bun for JavaScript/TypeScript" })
 
 -- autoclose setup
 require("autoclose").setup({
@@ -744,13 +744,57 @@ require("autoclose").setup({
 })
 
 -- nvim-dap setup
-vim.keymap.set("n", "<F5>", ":lua require('dap').continue()<CR>")
-vim.keymap.set("n", "<F10>", ":lua require('dap').continue()<CR>")
-vim.keymap.set("n", "<F11>", ":lua require('dap').continue()<CR>")
-vim.keymap.set("n", "<F12>", ":lua require('dap').continue()<CR>")
-vim.keymap.set("n", "<leader>b", ":lua require('dap').continue()<CR>")
-vim.keymap.set("n", "<leader>B", ":lua require('dap').continue()<CR>")
-vim.keymap.set("n", "<leader>lp", ":lua require('dap').continue()<CR>")
-vim.keymap.set("n", "<leader>dr", ":lua require('dap').continue()<CR>")
+-- C++ debugger
+local function compile_and_debug()
+    -- Command to compile the C++ program
+    local compile_cmd = "g++ -std=c++20 -Wall -Werror -g -pedantic -Weffc++ " .. vim.fn.expand("%:p")
+
+    -- Function to run after compilation
+    local on_compile_finish = function(job_id, data, event)
+        if event == "exit" then
+            -- Start the debugging session
+            require('dap').continue()
+            require("dapui").open()
+
+            -- Print keymap information
+            vim.cmd("echo 'F6 = continue | F7 = terminate | F9 = step over | F10 = step into | F12 = step out'")
+        end
+    end
+
+    -- Start the compilation job
+    vim.fn.jobstart(compile_cmd, { on_exit = on_compile_finish })
+end
+
+vim.keymap.set("n", "<F5>d", compile_and_debug, { silent = true, desc = "Compile and Debug C++ (GCC and cpptools)" })
+vim.keymap.set("n", "<F6>", ":lua require('dap').continue()<CR>")
+vim.keymap.set("n", "<F7>", ":lua require('dap').terminate(); require('dapui').close()<CR>", { silent = true, desc = "Terminate Debugging and Close DAP UI" })
+vim.keymap.set("n", "<F9>", ":lua require('dap').step_over()<CR>")
+vim.keymap.set("n", "<F10>", ":lua require('dap').step_into()<CR>")
+vim.keymap.set("n", "<F12>", ":lua require('dap').step_out()<CR>")
+vim.keymap.set("n", "<leader>b", ":lua require('dap').toggle_breakpoint()<CR>")
+vim.keymap.set("n", "<leader>B", ":lua require('dap').set_breakpoint(vim.fn.input('Breakpoint condition: '))<CR>")
+vim.keymap.set("n", "<leader>lp", ":lua require('dap').run_last()<CR>")
+vim.keymap.set("n", "<leader>dr", ":lua require('dap').repl.open()<CR>")
+
 require("dapui").setup()
 
+
+local dap = require('dap')
+
+local home = os.getenv("HOME")
+dap.adapters.cppdbg = {
+  id = 'cppdbg',
+  type = 'executable',
+  command = home .. '/.local/share/nvim/mason/packages/cpptools/extension/debugAdapters/bin/OpenDebugAD7'
+}
+
+dap.configurations.cpp = {
+  {
+    name = 'Launch file',
+    type = 'cppdbg',
+    request = 'launch',
+    program = "./a.out",
+    cwd = '${workspaceFolder}',
+    stopOnEntry = true,
+  },
+}
