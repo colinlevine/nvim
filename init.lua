@@ -257,6 +257,26 @@ require('lazy').setup({
     build = ':TSUpdate',
   },
 
+  {
+  "nvim-tree/nvim-tree.lua",
+    version = "*",
+    lazy = false,
+    dependencies = {
+     "nvim-tree/nvim-web-devicons",
+    },
+    config = function()
+     require("nvim-tree").setup {}
+    end,
+  },
+  {
+    'mfussenegger/nvim-dap'
+  },
+  {
+    'rcarriga/nvim-dap-ui'
+  },
+  {
+    'm4xshen/autoclose.nvim'
+  },
   -- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
   --       These are some example plugins that I've included in the kickstart repository.
   --       Uncomment any of the lines below to enable them.
@@ -269,8 +289,8 @@ require('lazy').setup({
   --    Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
   --
   --    For additional information see: https://github.com/folke/lazy.nvim#-structuring-your-plugins
---  { import = 'custom.plugins' },
-  { import = 'plugins.nvim-tree' },
+  --{ import = 'custom.plugins' },
+  --{ import = 'plugins.nvim-tree' },
 }, {})
 
 -- [[ Setting options ]]
@@ -710,5 +730,27 @@ require("nvim-tree").setup({
 vim.keymap.set("n", "<leader>t", ":NvimTreeToggle<CR>", { silent = true })
 
 --Compiler
-vim.keymap.set("n", "<leader>pc", ":!g++ -std=c++17 -Wall -Werror -g -pedantic -Weffc++ % && ./a.out<Return>", { silent = true, desc = "GCC for C++" })
-vim.keymap.set("n", "<leader>pt", ":!bun %<CR>", { silent = true, desc = "Bun for JavaScript/TypeScript" })
+vim.keymap.set("n", "<C-x>c", ":!g++ -std=c++20 -Wall -Werror -g -pedantic -Weffc++ % && ./a.out<Return>", { silent = true, desc = "GCC for C++" })
+vim.keymap.set("n", "<C-x>b", ":!bun %<CR>", { silent = true, desc = "Bun for JavaScript/TypeScript" })
+
+-- autoclose setup
+require("autoclose").setup({
+   keys = {
+     ["{"] = { escape = true, close = true, pair = "{}", disabled_filetypes = {} },
+     ["["] = { escape = true, close = true, pair = "[]", disabled_filetypes = {} },
+     ["("] = { escape = true, close = true, pair = "()", disabled_filetypes = {} },
+
+   },
+})
+
+-- nvim-dap setup
+vim.keymap.set("n", "<F5>", ":lua require('dap').continue()<CR>")
+vim.keymap.set("n", "<F10>", ":lua require('dap').continue()<CR>")
+vim.keymap.set("n", "<F11>", ":lua require('dap').continue()<CR>")
+vim.keymap.set("n", "<F12>", ":lua require('dap').continue()<CR>")
+vim.keymap.set("n", "<leader>b", ":lua require('dap').continue()<CR>")
+vim.keymap.set("n", "<leader>B", ":lua require('dap').continue()<CR>")
+vim.keymap.set("n", "<leader>lp", ":lua require('dap').continue()<CR>")
+vim.keymap.set("n", "<leader>dr", ":lua require('dap').continue()<CR>")
+require("dapui").setup()
+
