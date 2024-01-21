@@ -798,3 +798,8 @@ dap.configurations.cpp = {
     stopOnEntry = true,
   },
 }
+
+-- Define custom signs
+vim.fn.sign_define('DapBreakpoint', { text='🔴', texthl='Error', linehl='', numhl='' })
+vim.fn.sign_define('DapBreakpointCondition', { text='🔵', texthl='ConditionalBreakpoint', linehl='', numhl='' })
+
