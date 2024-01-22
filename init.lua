@@ -730,7 +730,7 @@ require("nvim-tree").setup({
 vim.keymap.set("n", "<leader>t", ":NvimTreeToggle<CR>", { silent = true })
 
 --Compiler
-vim.keymap.set("n", "<F5>c", ":!g++ -std=c++20 -Wall -Werror -g -pedantic -Weffc++ % && ./a.out<Return>", { silent = true, desc = "GCC for C++" })
+vim.keymap.set("n", "<F5>c", ":!g++ -std=c++20 -Wall -Werror -g -pedantic -Weffc++ % && ./a.out<Return>", { silent = true, desc = "G++ for C++" })
 vim.keymap.set("n", "<F5>b", ":!bun %<CR>", { silent = true, desc = "Bun for JavaScript/TypeScript" })
 
 -- autoclose setup
@@ -765,7 +765,7 @@ local function compile_and_debug()
     vim.fn.jobstart(compile_cmd, { on_exit = on_compile_finish })
 end
 
-vim.keymap.set("n", "<F5>d", compile_and_debug, { silent = true, desc = "Compile and Debug C++ (GCC and cpptools)" })
+vim.keymap.set("n", "<F5>d", compile_and_debug, { silent = true, desc = "Compile and Debug C++ (G++ and GDB)" })
 vim.keymap.set("n", "<F6>", ":lua require('dap').continue()<CR>")
 vim.keymap.set("n", "<F7>", ":lua require('dap').terminate(); require('dapui').close()<CR>", { silent = true, desc = "Terminate Debugging and Close DAP UI" })
 vim.keymap.set("n", "<F9>", ":lua require('dap').step_over()<CR>")
