@@ -732,7 +732,8 @@ vim.keymap.set("n", "<leader>t", ":NvimTreeToggle<CR>", { silent = true })
 --Compiler
 vim.keymap.set("n", "<F5>c", ":!g++ -std=c++20 -Wall -Werror -g -pedantic -Weffc++ % && ./a.out<Return>", { silent = true, desc = "G++ for C++" })
 vim.keymap.set("n", "<F5>b", ":!bun %<CR>", { silent = true, desc = "Bun for JavaScript/TypeScript" })
-vim.keymap.set("n", "<F5>m", ":!make<CR>", { silent = true, desc = "Run Makefile" })
+vim.keymap.set("n", "<F5>m", ":!make run<CR>", { silent = true, desc = "Make Run" })
+vim.keymap.set("n", "<F5>n", ":!make<CR>", { silent = true, desc = "Make" })
 
 -- autoclose setup
 require("autoclose").setup({
