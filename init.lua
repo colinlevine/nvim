@@ -789,13 +789,29 @@ dap.adapters.cppdbg = {
 }
 
 dap.configurations.cpp = {
+--  {
+--    name = 'Microsoft C++ Debugger',
+--    type = 'cppdbg',
+--    request = 'launch',
+--    program = "./a.out",
+--    cwd = '${workspaceFolder}',
+--    stopOnEntry = true,
+--  },
   {
-    name = 'Launch file',
+    name = 'GDB',
     type = 'cppdbg',
     request = 'launch',
     program = "./a.out",
     cwd = '${workspaceFolder}',
-    stopOnEntry = true,
+    MIMode = 'gdb',
+    miDebuggerPath = '/usr/bin/gdb',
+    setupCommands = {
+    {
+       text = '-enable-pretty-printing',
+       description =  'enable pretty printing',
+       ignoreFailures = false
+    },
+},
   },
 }
 
