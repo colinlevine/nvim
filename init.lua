@@ -821,3 +821,6 @@ dap.configurations.cpp = {
 vim.fn.sign_define('DapBreakpoint', { text='🔴', texthl='Error', linehl='', numhl='' })
 vim.fn.sign_define('DapBreakpointCondition', { text='🔵', texthl='ConditionalBreakpoint', linehl='', numhl='' })
 
+-- Tab fix
+vim.o.tabstop = 4
+vim.o.shiftwidth = 4
