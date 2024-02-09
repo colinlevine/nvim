@@ -91,7 +91,7 @@ require('lazy').setup({
 
       -- Useful status updates for LSP
       -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
-      { 'j-hui/fidget.nvim', opts = {} },
+      { 'j-hui/fidget.nvim',       opts = {} },
 
       -- Additional lua configuration, makes nvim stuff amazing!
       'folke/neodev.nvim',
@@ -116,7 +116,7 @@ require('lazy').setup({
   },
 
   -- Useful plugin to show you pending keybinds.
-  { 'folke/which-key.nvim', opts = {} },
+  { 'folke/which-key.nvim',  opts = {} },
   {
     -- Adds git related signs to the gutter, as well as utilities for managing changes
     'lewis6991/gitsigns.nvim',
@@ -258,14 +258,14 @@ require('lazy').setup({
   },
 
   {
-  "nvim-tree/nvim-tree.lua",
+    "nvim-tree/nvim-tree.lua",
     version = "*",
     lazy = false,
     dependencies = {
-     "nvim-tree/nvim-web-devicons",
+      "nvim-tree/nvim-web-devicons",
     },
     config = function()
-     require("nvim-tree").setup {}
+      require("nvim-tree").setup {}
     end,
   },
   {
@@ -558,6 +558,14 @@ local on_attach = function(_, bufnr)
   vim.api.nvim_buf_create_user_command(bufnr, 'Format', function(_)
     vim.lsp.buf.format()
   end, { desc = 'Format current buffer with LSP' })
+
+  vim.api.nvim_create_autocmd("BufWritePre", {
+    group = vim.api.nvim_create_augroup("LspFormatting", { clear = true }),
+    buffer = bufnr,
+    callback = function()
+      vim.lsp.buf.format { async = true }
+    end,
+  })
 end
 
 -- document existing key chains
@@ -621,7 +629,9 @@ capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
 local mason_lspconfig = require 'mason-lspconfig'
 
 mason_lspconfig.setup {
-  ensure_installed = vim.tbl_keys(servers),
+  ensure_installed = {
+    vim.tbl_keys(servers), "clangd", "cpptools", "css-lsp", "html-lsp", "json-lsp", "lua-language-server", "typescript-language-server", "prettier"
+  }
 }
 
 mason_lspconfig.setup_handlers {
@@ -700,76 +710,78 @@ vim.wo.relativenumber = true
 -- set termguicolors to enable highlight groups
 vim.opt.termguicolors = true
 require("nvim-tree").setup({
-    -- your other nvim-tree settings
-    renderer = {
-        icons = {
-            glyphs = {
-                default = '',
-                symlink = '',
-                git = {
-                  unstaged = "✗",
-                  staged = "✓",
-                  unmerged = "",
-                  renamed = "➜",
-                  untracked = "★",
-                  deleted = "",
-                  ignored = "◌"
-                  },
-                folder = {
-                  default = "",
-                  open = "",
-                  empty = "",
-                  empty_open = "",
-                  symlink = "",
-                  symlink_open = "",
-                 },
-                },
-            },
+  -- your other nvim-tree settings
+  renderer = {
+    icons = {
+      glyphs = {
+        default = '',
+        symlink = '',
+        git = {
+          unstaged = "✗",
+          staged = "✓",
+          unmerged = "",
+          renamed = "➜",
+          untracked = "★",
+          deleted = "",
+          ignored = "◌"
         },
-    })
+        folder = {
+          default = "",
+          open = "",
+          empty = "",
+          empty_open = "",
+          symlink = "",
+          symlink_open = "",
+        },
+      },
+    },
+  },
+})
 vim.keymap.set("n", "<leader>t", ":NvimTreeToggle<CR>", { silent = true })
 
 --Compiler
-vim.keymap.set("n", "<F5>c", ":!g++ -std=c++20 -Wall -Werror -g -pedantic -Weffc++ % && ./a.out<Return>", { silent = true, desc = "G++ for C++" })
+vim.keymap.set("n", "<F5>c", ":!g++ -std=c++20 -Wall -Werror -g -pedantic -Weffc++ % && ./a.out<Return>",
+  { silent = true, desc = "G++ for C++" })
 vim.keymap.set("n", "<F5>b", ":!bun %<CR>", { silent = true, desc = "Bun for JavaScript/TypeScript" })
 vim.keymap.set("n", "<F5>m", ":!make run<CR>", { silent = true, desc = "Make Run" })
 vim.keymap.set("n", "<F5>n", ":!make<CR>", { silent = true, desc = "Make" })
 
 -- autoclose setup
 require("autoclose").setup({
-   keys = {
-     ["{"] = { escape = true, close = true, pair = "{}", disabled_filetypes = {} },
-     ["["] = { escape = true, close = true, pair = "[]", disabled_filetypes = {} },
-     ["("] = { escape = true, close = true, pair = "()", disabled_filetypes = {} },
+  keys = {
+    ["{"] = { escape = true, close = true, pair = "{}", disabled_filetypes = {} },
+    ["["] = { escape = true, close = true, pair = "[]", disabled_filetypes = {} },
+    ["("] = { escape = true, close = true, pair = "()", disabled_filetypes = {} },
 
-   },
+  },
 })
 
 -- nvim-dap setup
 -- C++ debugger
 local function compile_and_debug()
-    -- Command to compile the C++ program
-    local compile_cmd = "g++ -std=c++20 -Wall -Werror -g -pedantic -Weffc++ " .. vim.fn.expand("%:p")
+  -- Command to compile the C++ program
+  local compile_cmd = "g++ -std=c++20 -Wall -Werror -g -pedantic -Weffc++ " .. vim.fn.expand("%:p")
 
-    -- Function to run after compilation
-    local on_compile_finish = function(job_id, data, event)
-        if event == "exit" then
-            -- Start the debugging session
-            require('dap').continue()
-            require("dapui").open()
+  -- Function to run after compilation
+  local on_compile_finish = function(job_id, data, event)
+    if event == "exit" then
+      -- Start the debugging session
+      require('dap').continue()
+      require("dapui").open()
 
-            -- Print keymap information
-            vim.cmd("echo 'F6 = continue | F7 = terminate | F9 = step over | F10 = step into | F12 = step out'")
-        end
+      -- Print keymap information
+      vim.cmd("echo 'F6 = continue | F7 = terminate | F9 = step over | F10 = step into | F12 = step out'")
     end
+  end
 
-    -- Start the compilation job
-    vim.fn.jobstart(compile_cmd, { on_exit = on_compile_finish })
+  -- Start the compilation job
+  vim.fn.jobstart(compile_cmd, { on_exit = on_compile_finish })
 end
 
 vim.keymap.set("n", "<F5>d", compile_and_debug, { silent = true, desc = "Compile and Debug C++ (G++ and GDB)" })
 vim.keymap.set("n", "<F6>", ":lua require('dap').continue()<CR>")
-vim.keymap.set("n", "<F7>", ":lua require('dap').terminate(); require('dapui').close()<CR>", { silent = true, desc = "Terminate Debugging and Close DAP UI" })
+vim.keymap.set("n", "<F7>", ":lua require('dap').terminate(); require('dapui').close()<CR>",
+  { silent = true, desc = "Terminate Debugging and Close DAP UI" })
 vim.keymap.set("n", "<F9>", ":lua require('dap').step_over()<CR>")
 vim.keymap.set("n", "<F10>", ":lua require('dap').step_into()<CR>")
 vim.keymap.set("n", "<F12>", ":lua require('dap').step_out()<CR>")
@@ -791,14 +803,14 @@ dap.adapters.cppdbg = {
 }
 
 dap.configurations.cpp = {
---  {
---    name = 'Microsoft C++ Debugger',
---    type = 'cppdbg',
---    request = 'launch',
---    program = "./a.out",
---    cwd = '${workspaceFolder}',
---    stopOnEntry = true,
---  },
+  --  {
+  --    name = 'Microsoft C++ Debugger',
+  --    type = 'cppdbg',
+  --    request = 'launch',
+  --    program = "./a.out",
+  --    cwd = '${workspaceFolder}',
+  --    stopOnEntry = true,
+  --  },
   {
     name = 'GDB',
     type = 'cppdbg',
@@ -808,18 +820,18 @@ dap.configurations.cpp = {
     MIMode = 'gdb',
     miDebuggerPath = '/usr/bin/gdb',
     setupCommands = {
-    {
-       text = '-enable-pretty-printing',
-       description =  'enable pretty printing',
-       ignoreFailures = false
+      {
+        text = '-enable-pretty-printing',
+        description = 'enable pretty printing',
+        ignoreFailures = false
+      },
     },
-},
   },
 }
 
 -- Define custom signs
-vim.fn.sign_define('DapBreakpoint', { text='🔴', texthl='Error', linehl='', numhl='' })
-vim.fn.sign_define('DapBreakpointCondition', { text='🔵', texthl='ConditionalBreakpoint', linehl='', numhl='' })
+vim.fn.sign_define('DapBreakpoint', { text = '🔴', texthl = 'Error', linehl = '', numhl = '' })
+vim.fn.sign_define('DapBreakpointCondition', { text = '🔵', texthl = 'ConditionalBreakpoint', linehl = '', numhl = '' })
 
 -- Tab fix
 vim.o.tabstop = 4
