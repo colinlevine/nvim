@@ -608,6 +608,7 @@ local servers = {
   html = {},
   jsonls = {},
   tsserver = {},
+  eslint = {},
   -- gopls = {},
   -- pyright = {},
   -- rust_analyzer = {},
