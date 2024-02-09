@@ -589,7 +589,9 @@ require('which-key').register({
 
 -- mason-lspconfig requires that these setup functions are called in this order
 -- before setting up the servers.
-require('mason').setup()
+require('mason').setup({
+  ensure_installed = {"cpptools", "prettier"}
+})
 require('mason-lspconfig').setup()
 
 -- Enable the following language servers
@@ -601,7 +603,11 @@ require('mason-lspconfig').setup()
 --  If you want to override the default filetypes that your language server will attach to you can
 --  define the property 'filetypes' to the map in question.
 local servers = {
-  -- clangd = {},
+  clangd = {},
+  cssls = {},
+  html = {},
+  jsonls = {},
+  tsserver = {},
   -- gopls = {},
   -- pyright = {},
   -- rust_analyzer = {},
@@ -629,9 +635,7 @@ capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
 local mason_lspconfig = require 'mason-lspconfig'
 
 mason_lspconfig.setup {
-  ensure_installed = {
-    vim.tbl_keys(servers), "clangd", "cpptools", "css-lsp", "html-lsp", "json-lsp", "lua-language-server", "typescript-language-server", "prettier"
-  }
+  ensure_installed = vim.tbl_keys(servers)
 }
 
 mason_lspconfig.setup_handlers {
