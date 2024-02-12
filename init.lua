@@ -842,5 +842,12 @@ vim.fn.sign_define('DapBreakpoint', { text = '🔴', texthl = 'Error', linehl = 
 vim.fn.sign_define('DapBreakpointCondition', { text = '🔵', texthl = 'ConditionalBreakpoint', linehl = '', numhl = '' })
 
 -- Tab fix
---vim.o.tabstop = 4
---vim.o.shiftwidth = 4
+vim.o.tabstop = 4
+vim.o.shiftwidth = 4
+-- Filetype-specific settings
+--vim.cmd([[
+--  augroup FileTypeOverrides
+--    autocmd!
+--    autocmd FileType cpp setlocal tabstop=2 shiftwidth=2
+--  augroup END
+--]])
