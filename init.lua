@@ -277,6 +277,9 @@ require('lazy').setup({
   {
     'm4xshen/autoclose.nvim'
   },
+  {
+    'prisma/vim-prisma' -- prisma highlighting
+  },
   -- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
   --       These are some example plugins that I've included in the kickstart repository.
   --       Uncomment any of the lines below to enable them.
@@ -609,6 +612,7 @@ local servers = {
   jsonls = {},
   tsserver = {},
   eslint = {},
+  prismals = {},
   -- gopls = {},
   -- pyright = {},
   -- rust_analyzer = {},
@@ -748,7 +752,7 @@ require("nvim-tree").setup({
 vim.keymap.set("n", "<leader>t", ":NvimTreeToggle<CR>", { silent = true })
 
 --Compiler
-vim.keymap.set("n", "<F5>c", ":!g++ -std=c++20 -Wall -Werror -g -pedantic -Weffc++ % && ./a.out<Return>",
+vim.keymap.set("n", "<F5>c", ":!g++ -std=c++17 -Wall -Werror -g -pedantic -Weffc++ % && ./a.out<Return>",
   { silent = true, desc = "G++ for C++" })
 vim.keymap.set("n", "<F5>b", ":!bun %<CR>", { silent = true, desc = "Bun for JavaScript/TypeScript" })
 vim.keymap.set("n", "<F5>m", ":!make run<CR>", { silent = true, desc = "Make Run" })
