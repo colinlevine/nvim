@@ -613,6 +613,8 @@ local servers = {
   tsserver = {},
   eslint = {},
   prismals = {},
+  tailwindcss = {},
+
   -- gopls = {},
   -- pyright = {},
   -- rust_analyzer = {},
