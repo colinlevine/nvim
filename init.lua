@@ -919,3 +919,6 @@ vim.keymap.set('n', '<leader>x', ':CopilotToggle<CR>')
 
 vim.g.copilot_no_tab_map = true
 vim.api.nvim_set_keymap("i", "<Right>", 'copilot#Accept("<CR>")', { silent = true, expr = true, noremap = true })
+
+--Enable on windows
+--vim.g.tsinstall_c_compiler = 'zig cc'
