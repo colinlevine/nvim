@@ -280,6 +280,9 @@ require('lazy').setup({
   {
     'prisma/vim-prisma' -- prisma highlighting
   },
+  {
+    'github/copilot.vim'
+  },
   -- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
   --       These are some example plugins that I've included in the kickstart repository.
   --       Uncomment any of the lines below to enable them.
@@ -759,6 +762,7 @@ vim.keymap.set("n", "<F5>c", ":!g++ -std=c++17 -Wall -Werror -g -pedantic -Weffc
 vim.keymap.set("n", "<F5>b", ":!bun %<CR>", { silent = true, desc = "Bun for JavaScript/TypeScript" })
 vim.keymap.set("n", "<F5>m", ":!make run<CR>", { silent = true, desc = "Make Run" })
 vim.keymap.set("n", "<F5>n", ":!make<CR>", { silent = true, desc = "Make" })
+vim.keymap.set("n", "<F5>p", ":!python3 %<CR>", { silent = true, desc = "Python" })
 
 -- autoclose setup
 require("autoclose").setup({
@@ -772,7 +776,7 @@ require("autoclose").setup({
 
 -- nvim-dap setup
 -- C++ debugger
-local function compile_and_debug()
+local function compile_and_debug_cpp()
   -- Command to compile the C++ program
   local compile_cmd = "g++ -std=c++20 -Wall -Werror -g -pedantic -Weffc++ " .. vim.fn.expand("%:p")
 
@@ -792,7 +796,7 @@ local function compile_and_debug()
   vim.fn.jobstart(compile_cmd, { on_exit = on_compile_finish })
 end
 
-vim.keymap.set("n", "<F5>d", compile_and_debug, { silent = true, desc = "Compile and Debug C++ (G++ and GDB)" })
+vim.keymap.set("n", "<F5>d", compile_and_debug_cpp, { silent = true, desc = "Compile and Debug C++ (G++ and GDB)" })
 vim.keymap.set("n", "<F6>", ":lua require('dap').continue()<CR>")
 vim.keymap.set("n", "<F7>", ":lua require('dap').terminate(); require('dapui').close()<CR>",
   { silent = true, desc = "Terminate Debugging and Close DAP UI" })
@@ -810,6 +814,7 @@ require("dapui").setup()
 local dap = require('dap')
 
 local home = os.getenv("HOME")
+-- C++ debugger setup
 dap.adapters.cppdbg = {
   id = 'cppdbg',
   type = 'executable',
@@ -843,9 +848,47 @@ dap.configurations.cpp = {
   },
 }
 
+-- Python debugger setup
+dap.adapters.python = {
+  type = 'executable',
+  command = 'python3',
+  args = { '-m', 'debugpy.adapter' },
+}
+
+dap.configurations.python = {
+  {
+    type = 'python',
+    request = 'launch',
+    name = 'Launch file',
+    program = "${file}", -- This configuration will launch the current file if used.
+    pythonPath = function()
+      -- Use the currently active virtualenv or fallback to system Python
+      local venv_path = os.getenv("VIRTUAL_ENV")
+      if venv_path then
+        return venv_path .. "/bin/python"
+      else
+        return "python3"
+      end
+    end,
+  },
+}
+
+local function debug_python()
+  -- Start the debugging session
+  require('dap').continue()
+  require("dapui").open()
+
+  -- Print keymap information
+  vim.cmd("echo 'F6 = continue | F7 = terminate | F9 = step over | F10 = step into | F12 = step out'")
+end
+
 -- Define custom signs
 vim.fn.sign_define('DapBreakpoint', { text = '🔴', texthl = 'Error', linehl = '', numhl = '' })
 vim.fn.sign_define('DapBreakpointCondition', { text = '🔵', texthl = 'ConditionalBreakpoint', linehl = '', numhl = '' })
+
+-- Add <F5><r> mapping for running Python debugger
+vim.keymap.set("n", "<F5>r", debug_python, { silent = true, desc = "Run Python Debugger" })
+
 
 -- Tab fix
 vim.o.tabstop = 4
@@ -857,3 +900,22 @@ vim.o.shiftwidth = 4
 --    autocmd FileType cpp setlocal tabstop=2 shiftwidth=2
 --  augroup END
 --]])
+
+
+-- Copilot toggle
+vim.cmd("Copilot disable")
+local copilot_on = false
+vim.api.nvim_create_user_command("CopilotToggle", function()
+  if copilot_on then
+    vim.cmd("Copilot disable")
+    print("Copilot OFF")
+  else
+    vim.cmd("Copilot enable")
+    print("Copilot ON")
+  end
+  copilot_on = not copilot_on
+end, { nargs = 0 })
+vim.keymap.set('n', '<leader>x', ':CopilotToggle<CR>')
+
+vim.g.copilot_no_tab_map = true
+vim.api.nvim_set_keymap("i", "<Right>", 'copilot#Accept("<CR>")', { silent = true, expr = true, noremap = true })
