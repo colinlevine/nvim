@@ -283,6 +283,9 @@ require('lazy').setup({
   {
     'github/copilot.vim'
   },
+  {
+    'nvim-neotest/nvim-nio'
+  }
   -- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
   --       These are some example plugins that I've included in the kickstart repository.
   --       Uncomment any of the lines below to enable them.
@@ -617,6 +620,7 @@ local servers = {
   eslint = {},
   prismals = {},
   tailwindcss = {},
+  jdtls = {},
 
   -- gopls = {},
   -- pyright = {},
@@ -763,6 +767,59 @@ vim.keymap.set("n", "<F5>b", ":!bun %<CR>", { silent = true, desc = "Bun for Jav
 vim.keymap.set("n", "<F5>m", ":!make run<CR>", { silent = true, desc = "Make Run" })
 vim.keymap.set("n", "<F5>n", ":!make<CR>", { silent = true, desc = "Make" })
 vim.keymap.set("n", "<F5>p", ":!python3 %<CR>", { silent = true, desc = "Python" })
+vim.keymap.set("n", "<F5>j", ":!javac % && java -cp %:h %:t:r<CR>", { silent = true, desc = "Compile and Run Java" })
+
+
+-- Floating Terminal (auto-detect file type)
+local function open_floating_terminal(command)
+  local buf = vim.api.nvim_create_buf(false, true) -- Create a scratch buffer
+  local width = math.floor(vim.o.columns * 0.8)
+  local height = math.floor(vim.o.lines * 0.7)
+  local row = math.floor((vim.o.lines - height) / 2)
+  local col = math.floor((vim.o.columns - width) / 2)
+
+  local opts = {
+    relative = "editor",
+    width = width,
+    height = height,
+    row = row,
+    col = col,
+    style = "minimal",
+    border = "rounded",
+  }
+
+  vim.api.nvim_open_win(buf, true, opts)
+  vim.fn.termopen(command)
+  vim.cmd("startinsert") -- Enter insert mode automatically
+
+  -- Keymap to close floating terminal with Esc
+  vim.api.nvim_buf_set_keymap(buf, "t", "<Esc>", "<C-\\><C-n>:q<CR>", { noremap = true, silent = true })
+end
+
+local function compile_and_run()
+  local filetype = vim.bo.filetype
+  local filename = vim.fn.expand("%")
+  local filedir = vim.fn.expand("%:h")
+  local filenameroot = vim.fn.expand("%:t:r")
+
+  local commands = {
+    cpp = "g++ -std=c++17 -Wall -Werror -g -pedantic -Weffc++ " .. filename .. " && ./a.out",
+    javascript = "bun " .. filename,
+    typescript = "bun " .. filename,
+    python = "python3 " .. filename,
+    java = "javac " .. filename .. " && java -cp " .. filedir .. " " .. filenameroot,
+  }
+
+  local cmd = commands[filetype]
+  if cmd then
+    open_floating_terminal(cmd)
+  else
+    print("No compiler command found for filetype: " .. filetype)
+  end
+end
+
+vim.keymap.set("n", "<F5>f", compile_and_run, { silent = true, desc = "Compile and Run in Floating Terminal" })
+--Floating terminal end
 
 -- autoclose setup
 require("autoclose").setup({
