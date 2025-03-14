@@ -621,8 +621,7 @@ local servers = {
   prismals = {},
   tailwindcss = {},
   jdtls = {},
-
-  -- gopls = {},
+  gopls = {},
   -- pyright = {},
   -- rust_analyzer = {},
   --  tsserver = {},
@@ -808,6 +807,7 @@ local function compile_and_run()
     typescript = "bun " .. filename,
     python = "python3 " .. filename,
     java = "javac " .. filename .. " && java -cp " .. filedir .. " " .. filenameroot,
+    go = "go run " .. filename,
   }
 
   local cmd = commands[filetype]
